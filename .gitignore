@@ -1,0 +1,24 @@
+# محیط مجازی پایتون
+venv/
+.venv/
+env/
+
+# فایل‌های کش پایتون
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# فایل‌های حاوی اطلاعات حساس (هرگز آپلود نشوند!)
+.env
+.env.local
+config.py
+secrets.py
+*.json
+credentials.json
+
+# فایل‌های سیستمی مک
+.DS_Store
+
+# لاگ‌ها
+*.log
