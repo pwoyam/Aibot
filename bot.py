@@ -22,6 +22,8 @@ import asyncio
 import logging
 import os
 import time
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from collections import defaultdict, deque
 
 from openai import AsyncOpenAI
@@ -74,6 +76,24 @@ conversations: dict[int, deque] = defaultdict(lambda: deque(maxlen=MAX_HISTORY_M
 last_request_time: dict[int, float] = {}
 
 deepseek_client = AsyncOpenAI(api_key=DEEPSEEK_API_KEY, base_url=DEEPSEEK_BASE_URL)
+
+# ---------------------------------------------------------------------------
+# Health Check Server (برای اینکه Railway بداند سرویس زنده است)
+# ---------------------------------------------------------------------------
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+    def log_message(self, format, *args):
+        pass
+
+def run_health_server():
+    port = int(os.getenv("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    logger.info(f"Health server running on port {port}")
+    server.serve_forever()
+
 
 
 # ---------------------------------------------------------------------------
@@ -216,6 +236,9 @@ def main():
     application.add_handler(CommandHandler("reset", reset_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_error_handler(error_handler)
+
+    # راه‌اندازی health server در یک thread جداگانه
+    threading.Thread(target=run_health_server, daemon=True).start()
 
     logger.info("ربات در حال اجراست...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
