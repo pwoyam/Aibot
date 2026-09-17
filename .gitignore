@@ -1,8 +1,74 @@
+# Environment variables (هرگز secrets را پوش نکن)
 .env
-.env.*
-*.db
-*.db.*
+.env.local
+.env.production
+*.env
+
+# Database files (دیتابیس‌ها روی هر سرور متفاوت هستند)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.backup_*
+data/bot.db
+data/bot.db.*
+
+# Backup files
+*.bak
+*.bak2
+*.backup
+*~
+
+# Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
 venv/
-.env.local
+ENV/
+env/
+.venv/
+venv.bak/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# PM2
+.pm2/
+pm2_dump.json
+
+# Tunnel configs
+ngrok.yml
+cloudflared.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+cookies.txt
+test_*.py
+.pytest_cache/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Build
+build/
+dist/
+*.egg-info/

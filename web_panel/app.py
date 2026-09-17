@@ -566,6 +566,49 @@ async def api_broadcast_status(request: Request):
         raise HTTPException(status_code=401)
     return broadcast_state
 
+
+
+
+
+
+
+@app.post("/api/models/{model_id}/toggle", dependencies=[Depends(require_auth)])
+async def toggle_model(model_id: int):
+    """تغییر وضعیت فعال/غیرفعال بودن مدل"""
+    conn = await get_db()
+    try:
+        # بررسی وجود مدل
+        cur = await conn.execute("SELECT is_active FROM ai_models WHERE id = ?", (model_id,))
+        row = await cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="مدل پیدا نشد")
+        
+        current_status = row['is_active']
+        new_status = 0 if current_status else 1
+        
+        # آپدیت وضعیت
+        await conn.execute(
+            "UPDATE ai_models SET is_active = ? WHERE id = ?",
+            (new_status, model_id)
+        )
+        await conn.commit()
+        
+        # ثبت لاگ
+        status_text = 'غیرفعال' if new_status == 0 else 'فعال'
+        await log_activity("toggle_model", f"مدل {model_id} {status_text} شد")
+        
+        return {
+            "success": True,
+            "is_active": bool(new_status),
+            "message": f"مدل {status_text} شد"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        await conn.close()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)

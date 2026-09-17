@@ -164,7 +164,11 @@ async function loadModels() {
                         '<span class="badge badge-primary">پیش‌فرض ⭐</span>' : 
                         `<button class="btn btn-sm btn-warning" onclick="setDefaultModel(${model.id})">
                             <i class="fas fa-star"></i>
-                        </button>`
+                        </button>
+                    <button class="btn btn-sm btn-warning" onclick="toggleModel(${model.id})" title="تغییر وضعیت">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    `
                     }
                 </td>
                 <td>
@@ -250,7 +254,7 @@ async function setDefaultModel(id) {
     }
 }
 
-document.getElementById('model-form').addEventListener('submit', async (e) => {
+safeAddEventListener('model-form', 'submit', async (e) => {
     e.preventDefault();
     
     const id = document.getElementById('model-id').value;
@@ -318,7 +322,7 @@ async function loadSettings() {
     }
 }
 
-document.getElementById('settings-form').addEventListener('submit', async (e) => {
+safeAddEventListener('settings-form', 'submit', async (e) => {
     e.preventDefault();
     
     const settings = {
@@ -433,84 +437,42 @@ async function loadLogs() {
 // ============================================================================
 // Initialize
 // ============================================================================
+
+// Safe event listener helper
+function safeAddEventListener(id, event, handler) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.addEventListener(event, handler);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
 });
 
 // Close modal on outside click
-document.getElementById('model-modal').addEventListener('click', (e) => {
+safeAddEventListener('model-modal', 'click', (e) => {
     if (e.target.id === 'model-modal') {
         closeModelModal();
     }
 });
-function initBroadcast() {
-    const sendBtn = document.getElementById('broadcast-send');
-    if (sendBtn) {
-        sendBtn.addEventListener('click', sendBroadcast);
-    }
-}
 
-async function sendBroadcast() {
-    const text = document.getElementById('broadcast-text').value.trim();
-    const status = document.getElementById('broadcast-status');
-    const btn = document.getElementById('broadcast-send');
-    
-    if (!text) {
-        alert('متن پیام خالی است!');
-        return;
-    }
-    if (!confirm('پیام به همه کاربران ارسال شود؟')) {
-        return;
-    }
-    
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ارسال...';
-    status.innerText = 'در حال شروع ارسال...';
-    
-    try {
-        const fd = new FormData();
-        fd.append('text', text);
-        const r = await fetch('/api/broadcast', {method: 'POST', body: fd});
-        const j = await r.json();
-        
-        if (j.total === 0) {
-            status.innerText = '❌ کاربری یافت نشد!';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال به همه کاربران';
-            return;
-        }
-        
-        status.innerText = `در حال ارسال به ${j.total} کاربر...`;
-        broadcastTimer = setInterval(pollBroadcastStatus, 2000);
-    } catch (err) {
-        status.innerText = '❌ خطا: ' + err.message;
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال به همه کاربران';
-    }
-}
 
-async function pollBroadcastStatus() {
+async function toggleModel(id) {
     try {
-        const r = await fetch('/api/broadcast/status');
-        const j = await r.json();
-        const status = document.getElementById('broadcast-status');
-        const btn = document.getElementById('broadcast-send');
+        const response = await fetch(`/api/models/${id}/toggle`, {
+            method: 'POST'
+        });
+        const data = await response.json();
         
-        status.innerHTML = `
-            <div style="background:#1e293b;padding:12px;border-radius:8px;margin-top:10px">
-                <div>✅ ارسال شده: <strong>${j.sent}</strong></div>
-                <div>❌ ناموفق: <strong>${j.failed}</strong></div>
-                <div>📊 مجموع: <strong>${j.total}</strong></div>
-            </div>
-        `;
-        
-        if (j.done) {
-            clearInterval(broadcastTimer);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال به همه کاربران';
-            status.innerHTML += '<div style="color:#10b981;margin-top:10px">✅ ارسال پیام همگانی به پایان رسید!</div>';
+        if (data.success) {
+            showToast(data.message, 'success');
+            // بارگذاری مجدد لیست مدل‌ها
+            loadModels();
+        } else {
+            showToast(data.detail || 'خطا', 'error');
         }
-    } catch (err) {
-        console.error('Error polling status:', err);
+    } catch (error) {
+        showToast('خطا در تغییر وضعیت مدل', 'error');
     }
 }
