@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت ربات هوش مصنوعی</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-robot"></i> پنل مدیریت</h2>
+                <p>ربات هوش مصنوعی</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>داشبورد</span>
+                </li>
+                <li class="nav-item" data-page="models">
+                    <i class="fas fa-brain"></i>
+                    <span>مدل‌های AI</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>تنظیمات</span>
+                </li>
+                <li class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>کاربران</span>
+                </li>
+                <li class="nav-item" data-page="logs">
+                    <i class="fas fa-history"></i>
+                    <span>لاگ‌ها</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page active">
+                <div class="page-header">
+                    <h1>داشبورد</h1>
+                    <p>نمای کلی از وضعیت ربات</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-users">0</h3>
+                            <p>کل کاربران</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-messages">0</h3>
+                            <p>کل پیام‌ها</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-active-models">0</h3>
+                            <p>مدل‌های فعال</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-today-messages">0</h3>
+                            <p>پیام‌های امروز</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>فعالیت‌های اخیر</h2>
+                    </div>
+                    <div id="recent-activities">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>هنوز فعالیتی ثبت نشده است</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Models Page -->
+            <div id="page-models" class="page">
+                <div class="page-header">
+                    <h1>مدل‌های AI</h1>
+                    <p>مدیریت مدل‌های هوش مصنوعی</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>لیست مدل‌ها</h2>
+                        <button class="btn btn-primary" onclick="openAddModelModal()">
+                            <i class="fas fa-plus"></i>
+                            افزودن مدل جدید
+                        </button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>نام نمایشی</th>
+                                <th>کد</th>
+                                <th>Base URL</th>
+                                <th>وضعیت</th>
+                                <th>پیش‌فرض</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="models-table-body">
+                            <tr>
+                                <td colspan="6" class="empty-state">در حال بارگذاری...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page">
+                <div class="page-header">
+                    <h1>تنظیمات</h1>
+                    <p>تنظیمات کلی ربات</p>
+                </div>
+                <div class="content-card">
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label>نام ربات</label>
+                            <input type="text" class="form-control" id="setting-bot_name">
+                        </div>
+                        <div class="form-group">
+                            <label>پیام خوش‌آمدگویی</label>
+                            <textarea class="form-control" id="setting-welcome_message" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>محدودیت روزانه پیام</label>
+                            <input type="number" class="form-control" id="setting-daily_message_limit">
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="setting-enable_chat"> فعال‌سازی چت</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="setting-enable_translate"> فعال‌سازی ترجمه</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="setting-enable_summarize"> فعال‌سازی خلاصه‌سازی</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="setting-enable_url_summarize"> فعال‌سازی خلاصه لینک</label>
+                        </div>
+                        <div class="form-group">
+                            <label><input type="checkbox" id="setting-enable_pdf_download"> فعال‌سازی دانلود PDF</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            ذخیره تنظیمات
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="page-users" class="page">
+                <div class="page-header">
+                    <h1>کاربران</h1>
+                    <p>مدیریت کاربران ربات</p>
+                </div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>لیست کاربران</h2>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>نام کاربری</th>
+                                <th>نام</th>
+                                <th>تعداد پیام</th>
+                                <th>وضعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="6" class="empty-state">در حال بارگذاری...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                </div>
+            </div></div>
+            </div>
+
+        </main>
+    </div>
+
+            </div>
+
+            <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
