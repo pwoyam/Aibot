@@ -4,7 +4,7 @@
 .env.production
 *.env
 
-# Database files (دیتابیس‌ها روی هر سرور متفاوت هستند)
+# Database files
 data/*.db
 data/*.db-shm
 data/*.db-wal
@@ -18,7 +18,7 @@ data/bot.db.*
 *.backup
 *~
 
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -28,7 +28,6 @@ venv/
 ENV/
 env/
 .venv/
-venv.bak/
 
 # Logs
 *.log
@@ -58,15 +57,6 @@ desktop.ini
 cookies.txt
 test_*.py
 .pytest_cache/
-
-# Coverage
-htmlcov/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
 
 # Build
 build/
